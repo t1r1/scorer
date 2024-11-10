@@ -17,29 +17,16 @@ const NATIONAL_WAGE_BY_YEAR = {
 // a side note: these values would be better fetched from gov.uk or other APIs,
 // but for simplicity and due task's time constraints, here it's harcoded
 
-// {
-// "enjoys_job": "yes",
-// "repected_by_managers": "no",
-// "good_for_carers": "yes",
-// "contracted_hours": 20,
-// "hours_actually_worked": 34,
-// "unpaid_extra_work": "unsure", "age": 26,
-// "hourly_rate": "£8.72",
-// "submitted_date": 1608211454000
-// }
 const MARKET_CURRENCY = "£"; // assume that this is default for the current market, for other markets it can be different and configurable in i18n settings.
 
-const SCORERS = [
-  { name: "enjoys job", scorer: yesOrNoScorer("enjoys_job") },
-  {
-    name: "respected by managers",
-    scorer: yesOrNoScorer("respected_by_managers"),
-  },
-  { name: "good for carers", scorer: yesOrNoScorer("good_for_carers") },
-  { name: "work life balance", scorer: hoursScorer },
-  { name: "unpaid extra work", scorer: yesOrNoScorer("unpaid_extra_work") },
-  { name: "hourly rate", scorer: hourlyRateScorer },
-];
+const SCORERS = {
+  enjoys_job: yesOrNoScorer("enjoys_job"),
+  respected_by_managers: yesOrNoScorer("respected_by_managers"),
+  good_for_carers: yesOrNoScorer("good_for_carers"),
+  working_hours: hoursScorer,
+  unpaid_extra_work: yesOrNoScorer("unpaid_extra_work"),
+  "hourly rate": hourlyRateScorer,
+};
 
 function getYear(submitted_date) {
   return new Date(submitted_date).getFullYear();
@@ -97,15 +84,26 @@ function main() {
   }
   const raw = fs.readFileSync(filename);
   const answers = JSON.parse(raw);
-  const accScore = calculateScore(answers);
-  console.log(`Survey score: ${accScore}/${SCORERS.length}`);
+  const result = calculateScore(answers);
+  console.log(`Survey score: ${result.score}/${result.total}`);
 }
 
 function calculateScore(answers) {
-  const accumulatedScore = SCORERS.reduce((accumulator, mapper) => {
-    return accumulator + mapper["scorer"](answers);
-  }, 0);
-  return accumulatedScore;
+  let score = 0;
+  let total = Object.keys(SCORERS).length;
+
+  for (const scorerName in SCORERS) {
+    score += SCORERS[scorerName](answers);
+    if (answers[scorerName] === "unsure") {
+      // Missing answers do not contribute to the overall score.
+      // Undefined, null, empty string also can be presented here, but within the time constraint I assume that all data validations, sanitanization had been performed before
+      total -= 1;
+    }
+  }
+  return {
+    score,
+    total,
+  };
 }
 
 main();
