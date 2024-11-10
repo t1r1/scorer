@@ -103,6 +103,7 @@ function calculateScore(answers) {
   return {
     score,
     total,
+    percent: (score / total) * 100,
   };
 }
 
