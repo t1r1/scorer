@@ -13,6 +13,8 @@ const NATIONAL_WAGE_BY_YEAR = {
   },
 };
 
+const MAX_EXCEDEENG_HOURS = 8;
+
 // source: https://www.gov.uk/national-minimum-wage-rates
 // a side note: these values would be better fetched from gov.uk or other APIs,
 // but for simplicity and due task's time constraints, here it's harcoded
@@ -70,7 +72,8 @@ function hourlyRateScorer(survey) {
 function hoursScorer(survey) {
   return survey.contracted_hours !== undefined &&
     survey.hours_actually_worked !== undefined &&
-    survey.hours_actually_worked <= survey.contracted_hours + 8
+    survey.hours_actually_worked <=
+      survey.contracted_hours + MAX_EXCEDEENG_HOURS
     ? 1
     : 0;
 }
