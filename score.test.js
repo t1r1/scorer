@@ -12,5 +12,5 @@ const testData = {
 };
 
 test("calculates the score", () => {
-  expect(calculateScore(testData).toBe(60));
+  expect(calculateScore(testData)).toEqual({ score: 2, total: 5 });
 });
