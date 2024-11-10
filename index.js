@@ -17,7 +17,7 @@ const NATIONAL_WAGE_BY_YEAR = {
 // a side note: these values would be better fetched from gov.uk or other APIs,
 // but for simplicity and due task's time constraints, here it's harcoded
 
-const MARKET_CURRENCY = "£"; // assume that this is default for the current market, for other markets it can be different and configurable in i18n settings.
+const MARKET_CURRENCY = "£"; // assuming this is the default currency for the current market. for other markets it can be different and configurable in i18n settings.
 
 const SCORERS = {
   enjoys_job: yesOrNoScorer("enjoys_job"),
@@ -38,13 +38,13 @@ function parseHourlyRate(stringAmount) {
 
 function yesOrNoScorer(fieldName) {
   return function (survey) {
-    return survey[fieldName]?.toLowerCase() === "yes" ? 1 : 0;
+    return survey[fieldName] === "yes" ? 1 : 0;
   };
 }
 
 function getNationalWage(age, year) {
   if (!NATIONAL_WAGE_BY_YEAR[year]) {
-    year = 2024;
+    year = 2024; // FALLBACK, to be discussible. Another option would be throwing and logging an error in the monitoring like Sentry to explicitly know about failing year
   }
   const wages = NATIONAL_WAGE_BY_YEAR[year];
 
@@ -81,6 +81,7 @@ function main() {
     console.log("Usage: index.js <filename>");
     process.exit(1);
   }
+
   const raw = fs.readFileSync(filename);
   const answers = JSON.parse(raw);
   const result = calculateScore(answers);
@@ -112,6 +113,7 @@ function calculateScore(answers) {
 if (require.main === module) {
   main();
 }
+
 module.exports = {
   calculateScore,
   parseHourlyRate,
