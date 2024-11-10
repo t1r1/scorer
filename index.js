@@ -25,7 +25,7 @@ const SCORERS = {
   good_for_carers: yesOrNoScorer("good_for_carers"),
   working_hours: hoursScorer,
   unpaid_extra_work: yesOrNoScorer("unpaid_extra_work"),
-  "hourly rate": hourlyRateScorer,
+  hourly_rate: hourlyRateScorer,
 };
 
 function getYear(submitted_date) {
@@ -61,7 +61,6 @@ function hourlyRateScorer(survey) {
   surveyYear = getYear(survey.submitted_date);
   parsePaidAmount = parseHourlyRate(survey.hourly_rate);
   nationalWageForRespondent = getNationalWage(
-    NATIONAL_WAGE_BY_YEAR,
     survey.age,
     surveyYear.toString()
   );
@@ -86,6 +85,7 @@ function main() {
   const answers = JSON.parse(raw);
   const result = calculateScore(answers);
   console.log(`Survey score: ${result.score}/${result.total}`);
+  return result;
 }
 
 function calculateScore(answers) {
@@ -106,5 +106,7 @@ function calculateScore(answers) {
   };
 }
 
-main();
+if (require.main === module) {
+  main();
+}
 module.exports = calculateScore;
