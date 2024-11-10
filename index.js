@@ -84,7 +84,9 @@ function main() {
   const raw = fs.readFileSync(filename);
   const answers = JSON.parse(raw);
   const result = calculateScore(answers);
-  console.log(`Survey score: ${result.score}/${result.total}`);
+  console.log(
+    `Survey score: ${result.score}/${result.total} - ${result.percent}%`
+  );
   return result;
 }
 
@@ -110,4 +112,10 @@ function calculateScore(answers) {
 if (require.main === module) {
   main();
 }
-module.exports = calculateScore;
+module.exports = {
+  calculateScore,
+  parseHourlyRate,
+  getYear,
+  getNationalWage,
+  hourlyRateScorer,
+};
